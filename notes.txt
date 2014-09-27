@@ -1,0 +1,69 @@
+castling
+promotion
+add a way to tell if game over
+add AI
+full move list for a game
+check checker - if in check can not move except out of check // all done.
+king move val
+player login
+king validation {check that it is only one spacecheck that the space is on the board. not less than a/1 or h/8check that his own piece is not in the wayonly 8 places he can go so add the 8 to an array then loop through the array and validate each spot?or do i validate in the way i would add to that first array}
+
+check checker
+anytime moving the king it will need to run the check checker as part of the move validation. 
+needs to go through each piece of the other color on the board and run the validation function with the $to being the location of the other teams king. if true then the check checker = true.
+if one is true no reason to check for more than one. 
+? if i move my queen i only need to check if my queen now puts the king in check ? true or falserun it after any move to see if it put the other player in check.?
+when to run the check checker
+during the king's move validation to see if he is moving in to check.
+on load to anounce someone is in check
+at beginning of turn to see if you are in check (maybe)at end of any move you make to see if your king will (still) be in check after making this move. at end of kings turn 
+incheck($from, $to, $shortcode, $auth)if its not the king moving then i need to get the kings location from the db. if it is the king then i know where the king will be going and i can run the check from that...then find all the pieces of other colorthen i have the location of the other piece use as $fromand location of king is $tothen run a move validation for each of the white pieces and if even one is true then it is in checkpull all data from database and use the array 
+incheck($kingcolor, $auth)
+then if black search db for bk if white search for wk...
+then find all the pieces of other color
+then i have the location of the other piece use as $from
+and location of king is $to
+then run a move validation for each of the white pieces and if even one is true then it is in check
+
+4/25 get kings location update the database with the move then grab the whole baord from the databasethen for each piece of the opposing color i run a valid move check on it using kings location as the to blockif it returns true then its a check and i have to undo the database update. if none return true then its a valid move and no check.
+
+7/4/2012
+Queens are not able to move
+
+
+
+pawn promotion
+	$piece = new piece();
+	$type = $piece->movingtype($from, $auth);
+	$color = $piece->movingcolor($from, $auth);
+	if ((($type=='pawn' && $color=='white' && $from[1]=='7' && $to[1]=='8') || ($type=='pawn' && $color=='black' && $from[1]=='2' && $to[1]=='1')) && isempty($promoteto)) {
+		<form method="post" action="move.php?auth=<?php echo $auth;?>">
+			<input type="hidden" name="from" value=""> 
+			<input type="hidden" name="to" value="">
+			<select name="promoteto">
+				<option value="q">Queen</option>
+				<option value="n">Knight</option>
+				<option value="r">Rook</option>
+				<option value="b">Bishop</option>
+			</select> 
+			<input type="Submit" value="Submit" name="Submit">
+		</form>
+	} else if (isset($_POST['promoteto'])) {
+		$promote = isset($_POST['promoteto']);
+		if ($color=='white') {
+			$colorcode = 'w';
+		} else if($color=='black') {
+			$colorcode = 'b';
+		}
+		$promoteto = $colorcode.$promote;
+		$piece = new $type($color);
+		$piece->set_shortcode($color);
+		$piece->promote($from, $to, $promoteto, $auth);
+		header("Location: index.php?auth=$auth&from=$from&to=$to");
+	} else {
+		$piece = new $type($color);
+		$piece->set_shortcode($color);
+		$shortcode = $piece->get_shortcode();
+		$piece->move($from, $to, $shortcode, $auth);
+		header("Location: index.php?auth=$auth&from=$from&to=$to");
+	}
